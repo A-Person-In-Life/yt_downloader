@@ -10,7 +10,7 @@ class API:
         self.download_params = {
             "noplaylist": True,
             "format": "mp3/bestaudio/best",
-            "outtmpl": "downloads/downloaded_yt_videos",
+            "outtmpl": "downloads/",
             "postprocessors": [{
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",}]}
@@ -51,9 +51,8 @@ class API:
             print(f"Unexpected error fetching info for {url}: {e}")
 
         return            
-                            
-    async def download(self):
-        async def download_single(url):
+    
+    async def download_single(self,url):
             try:
                 with yt_dlp.YoutubeDL(self.download_params) as downloading_session:
                     await asyncio.to_thread(downloading_session.download, [url])
@@ -63,8 +62,10 @@ class API:
                 print(f"Download error for {url}: {e}")
             except Exception as e:
                 print(f"Unexpected error downloading {url}: {e}")
-        
-        await asyncio.gather(*[download_single(url) for url in self.urls])
+                            
+    async def download(self):
+        await asyncio.gather(*[self.download_single(url) for url in self.urls])
+
 
 async def main():
     url_input = input("Enter URLs: ")
